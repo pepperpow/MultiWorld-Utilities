@@ -1624,6 +1624,7 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
     else:
         rom.write_byte(0x180048, 0x08)
 
+    # rework these into ASM changes likely, as these are annoying to reverse when adjusted
     if triforcehud != 'normal': # very rough, should just be an ASM change 
         my_bytes = rom.read_bytes(0x100000,0x140000)
         cur_pos = my_bytes.find(bytes([0xe2, 0x20, 0xaf, 0x67, 0x81, 0x30])) # replace goal item conditions with different things
@@ -1632,11 +1633,11 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
             targets.append(0x100000 + cur_pos + 2)
             cur_pos = my_bytes.find(bytes([0xe2, 0x20, 0xaf, 0x67, 0x81, 0x30]), cur_pos+1)
         if len(targets) == 2:
-            replacements = zip(targets, [[0xA9, 0xFF, 0xEA, 0xEA], [0xAF, 0x18, 0xF4, 0x7E]])
+            replacements = [[0xAF, 0x18, 0xF4, 0x7E], [0xA9, 0xFF, 0xEA, 0xEA]]
             if triforcehud in ['hide_goal', 'hide_both']:
-                rom.write_bytes(*replacements[0])
+                rom.write_bytes(targets[0], replacements[0])
             if triforcehud in ['hide_total', 'hide_both']:
-                rom.write_bytes(*replacements[1])
+                rom.write_bytes(targets[1], replacements[1])
     
     if reduceflashing: # all of this is irreversible as of now, but can be returned with some effort
         rom.write_bytes(0xEE651, [0xEA]*3) # nop out any flash triggers (0x0FF9)
