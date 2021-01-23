@@ -30,7 +30,7 @@ def adjust(args):
     # palettes_options['link']=args.link_palettesvera
     
     apply_rom_settings(rom, args.heartbeep, args.heartcolor, args.quickswap, args.fastmenu, args.disablemusic,
-                       args.sprite, palettes_options)
+                       args.sprite, palettes_options, triforcehud=args.triforcehud, cutscenespeed=args.cutscenespeed, reduceflashing=args.reduceflashing)
     path = output_path(f'{os.path.basename(args.rom)[:-4]}_adjusted.sfc')
     rom.write_to_file(path)
 

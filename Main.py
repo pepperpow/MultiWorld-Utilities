@@ -243,7 +243,8 @@ def main(args, seed=None):
         
         apply_rom_settings(rom, args.heartbeep[player], args.heartcolor[player], args.quickswap[player],
                            args.fastmenu[player], args.disablemusic[player], args.sprite[player],
-                           palettes_options, world, player, True)
+                           palettes_options, world, player, True,
+                           triforcehud=args.triforcehud, cutscenespeed=args.cutscenespeed, reduceflashing=args.reduceflashing)
 
 
         mcsb_name = ''
