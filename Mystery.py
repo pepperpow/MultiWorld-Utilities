@@ -405,6 +405,8 @@ def roll_settings(weights, plando_options: typing.Set[str] = frozenset(("bosses"
     # change minimum to required pieces to avoid problems
     ret.triforce_pieces_available = min(max(ret.triforce_pieces_required, int(ret.triforce_pieces_available)), 90)
 
+    ret.shop_shuffle_slots = int(get_choice('shop_shuffle_slots', weights, '0'))
+
     ret.shop_shuffle = get_choice('shop_shuffle', weights, '')
     if not ret.shop_shuffle:
         ret.shop_shuffle = ''
@@ -510,11 +512,15 @@ def roll_settings(weights, plando_options: typing.Set[str] = frozenset(("bosses"
 
     ret.shuffle_prizes = get_choice('shuffle_prizes', weights, "g")
 
-    ret.required_medallions = (get_choice("misery_mire_medallion", weights, "random"),
-                               get_choice("turtle_rock_medallion", weights, "random"))
-    for medallion in ret.required_medallions:
-        if medallion not in {"random", "Ether", "Bombos", "Quake"}:
+    ret.required_medallions = [get_choice("misery_mire_medallion", weights, "random"),
+                               get_choice("turtle_rock_medallion", weights, "random")]
+
+    for index, medallion in enumerate(ret.required_medallions):
+        ret.required_medallions[index] = {"ether": "Ether", "quake": "Quake", "bombos": "Bombos", "random": "random"}\
+            .get(medallion.lower(), None)
+        if not ret.required_medallions[index]:
             raise Exception(f"unknown Medallion {medallion}")
+
     inventoryweights = weights.get('startinventory', {})
     startitems = []
     for item in inventoryweights.keys():

@@ -9,9 +9,10 @@ import time
 import zlib
 import concurrent.futures
 
-from BaseClasses import World, CollectionState, Item, Region, Location, PlandoItem
+from BaseClasses import World, CollectionState, Item, Region, Location
+from Shops import ShopSlotFill, create_shops, SHOP_ID_START, FillDisabledShopSlots
 from Items import ItemFactory, item_table, item_name_groups
-from Regions import create_regions, create_shops, mark_light_world_regions, lookup_vanilla_location_to_entrance
+from Regions import create_regions, mark_light_world_regions, lookup_vanilla_location_to_entrance
 from InvertedRegions import create_inverted_regions, mark_dark_world_regions
 from EntranceShuffle import link_entrances, link_inverted_entrances, plando_connect
 from Rom import patch_rom, patch_race_rom, patch_enemizer, apply_rom_settings, LocalRom, get_hash_string
@@ -83,6 +84,7 @@ def main(args, seed=None):
     world.triforce_pieces_available = args.triforce_pieces_available.copy()
     world.triforce_pieces_required = args.triforce_pieces_required.copy()
     world.shop_shuffle = args.shop_shuffle.copy()
+    world.shop_shuffle_slots = args.shop_shuffle_slots.copy()
     world.progression_balancing = {player: not balance for player, balance in args.skip_progression_balancing.items()}
     world.shuffle_prizes = args.shuffle_prizes.copy()
     world.sprite_pool = args.sprite_pool.copy()
@@ -178,13 +180,13 @@ def main(args, seed=None):
     for player in range(1, world.players + 1):
         set_rules(world, player)
 
-    logger.info('Placing Dungeon Prizes.')
-
-    fill_prizes(world)
-
     logger.info("Running Item Plando")
 
     distribute_planned(world)
+
+    logger.info('Placing Dungeon Prizes.')
+
+    fill_prizes(world)
 
     logger.info('Placing Dungeon Items.')
 
@@ -209,7 +211,13 @@ def main(args, seed=None):
     if world.players > 1:
         balance_multiworld_progression(world)
 
+    logger.info("Filling Shop Slots")
+
+    ShopSlotFill(world)
+
     logger.info('Patching ROM.')
+
+
 
     outfilebase = 'BM_%s' % (args.outputname if args.outputname else world.seed)
 
@@ -226,7 +234,7 @@ def main(args, seed=None):
         patch_rom(world, rom, player, team, use_enemizer)
 
         if use_enemizer:
-            patch_enemizer(world, player, rom, args.enemizercli)
+            patch_enemizer(world, team, player, rom, args.enemizercli)
 
         if args.race:
             patch_race_rom(rom, world, player)
@@ -245,7 +253,6 @@ def main(args, seed=None):
                            args.fastmenu[player], args.disablemusic[player], args.sprite[player],
                            palettes_options, world, player, True,
                            cutscenespeed=args.cutscenespeed[player], reduceflashing=args.reduceflashing[player])
-
 
         mcsb_name = ''
         if all([world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player],
@@ -282,7 +289,7 @@ def main(args, seed=None):
           "progressive": world.progressive,                                # A
           "hints": 'True' if world.hints[player] else 'False'              # B
         }
-        #                  0  1  2  3  4 5  6  7 8 9 A B 
+        #                  0  1  2  3  4 5  6  7 8 9 A B
         outfilesuffix = ('_%s_%s-%s-%s-%s%s_%s-%s%s%s%s%s' % (
           #  0          1      2      3    4     5    6      7     8        9         A     B           C
           # _noglitches_normal-normal-open-ganon-ohko_simple-balanced-keysanity-retro-prog_random-nohints
@@ -313,7 +320,7 @@ def main(args, seed=None):
 
     pool = concurrent.futures.ThreadPoolExecutor()
     multidata_task = None
-    check_beatability_task = pool.submit(world.can_beat_game)
+    check_accessibility_task = pool.submit(world.fulfills_accessibility)
     if not args.suppress_rom:
 
         rom_futures = []
@@ -330,13 +337,14 @@ def main(args, seed=None):
                 return get_entrance_to_region(entrance.parent_region)
 
         # collect ER hint info
-        er_hint_data = {player: {} for player in range(1, world.players + 1) if world.shuffle[player] != "vanilla"}
+        er_hint_data = {player: {} for player in range(1, world.players + 1) if world.shuffle[player] != "vanilla" or world.retro[player]}
         from Regions import RegionType
         for region in world.regions:
             if region.player in er_hint_data and region.locations:
                 main_entrance = get_entrance_to_region(region)
                 for location in region.locations:
                     if type(location.address) == int:  # skips events and crystals
+                        if location.address >= SHOP_ID_START + 33:  continue
                         if lookup_vanilla_location_to_entrance[location.address] != main_entrance.name:
                             er_hint_data[region.player][location.address] = main_entrance.name
 
@@ -363,10 +371,26 @@ def main(args, seed=None):
                 checks_in_area[location.player]["Dark World"].append(location.address)
             checks_in_area[location.player]["Total"] += 1
 
+        oldmancaves = []
+        for region in [world.get_region("Old Man Sword Cave", player) for player in range(1, world.players + 1) if world.retro[player]]:
+            item = ItemFactory(region.shop.inventory[0]['item'], region.player)
+            player = region.player
+            location_id = SHOP_ID_START + 33
+
+            if region.type == RegionType.LightWorld:
+                checks_in_area[player]["Light World"].append(location_id)
+            else:
+                checks_in_area[player]["Dark World"].append(location_id)
+            checks_in_area[player]["Total"] += 1
+
+            er_hint_data[player][location_id] = get_entrance_to_region(region).name
+            oldmancaves.append(((location_id, player), (item.code, player)))
 
         precollected_items = [[] for player in range(world.players)]
         for item in world.precollected_items:
             precollected_items[item.player - 1].append(item.code)
+
+        FillDisabledShopSlots(world)
 
         def write_multidata(roms):
             for future in roms:
@@ -379,7 +403,11 @@ def main(args, seed=None):
                 multidatatags.append("Spoiler")
                 if not args.skip_playthrough:
                     multidatatags.append("Play through")
-            minimum_versions = {"server": (1,0,0)}
+            minimum_versions = {"server": (1, 0, 0)}
+            minimum_versions["clients"] = client_versions = []
+            for (slot, team, name) in rom_names:
+                if world.shop_shuffle_slots[slot]:
+                    client_versions.append([team, slot, [3, 6, 1]])
             multidata = zlib.compress(json.dumps({"names": parsed_names,
                                                   # backwards compat for < 2.4.1
                                                   "roms": [(slot, team, list(name.encode()))
@@ -390,7 +418,7 @@ def main(args, seed=None):
                                                   "locations": [((location.address, location.player),
                                                                  (location.item.code, location.item.player))
                                                                 for location in world.get_filled_locations() if
-                                                                type(location.address) is int],
+                                                                type(location.address) is int] + oldmancaves,
                                                   "checks_in_area": checks_in_area,
                                                   "server_options": get_options()["server_options"],
                                                   "er_hint_data": er_hint_data,
@@ -404,8 +432,11 @@ def main(args, seed=None):
                 f.write(multidata)
 
         multidata_task = pool.submit(write_multidata, rom_futures)
-    if not check_beatability_task.result():
-        raise Exception("Game appears unbeatable. Aborting.")
+    if not check_accessibility_task.result():
+        if not world.can_beat_game():
+            raise Exception("Game appears is unbeatable. Aborting.")
+        else:
+            logger.warning("Location Accessibility requirements not fulfilled.")
     if not args.skip_playthrough:
         logger.info('Calculating playthrough.')
         create_playthrough(world)
@@ -459,6 +490,7 @@ def copy_world(world):
     ret.shufflepots = world.shufflepots.copy()
     ret.shuffle_prizes = world.shuffle_prizes.copy()
     ret.shop_shuffle =  world.shop_shuffle.copy()
+    ret.shop_shuffle_slots = world.shop_shuffle_slots.copy()
     ret.dark_room_logic = world.dark_room_logic.copy()
     ret.restrict_dungeon_item_on_boss = world.restrict_dungeon_item_on_boss.copy()
 
@@ -531,7 +563,7 @@ def copy_dynamic_regions_and_locations(world, ret):
 
         if region.shop:
             new_reg.shop = region.shop.__class__(new_reg, region.shop.room_id, region.shop.shopkeeper_config,
-                                                 region.shop.custom, region.shop.locked)
+                                                 region.shop.custom, region.shop.locked, region.shop.sram_offset)
             ret.shops.append(new_reg.shop)
 
     for location in world.dynamic_locations:
