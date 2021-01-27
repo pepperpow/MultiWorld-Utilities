@@ -648,7 +648,6 @@ def roll_settings(weights, plando_options: typing.Set[str] = frozenset(("bosses"
         ret.fastmenu = get_choice('menuspeed', romweights, "normal")
         ret.cutscenespeed = get_choice('cutscenespeed', romweights, "normal")
         ret.reduceflashing = get_choice('reduceflashing', romweights, False)
-        ret.triforcehud = get_choice('triforcehud', romweights, "normal")
         ret.heartcolor = get_choice('heartcolor', romweights, "red")
         ret.heartbeep = convert_to_on_off(get_choice('heartbeep', romweights, "normal"))
         ret.ow_palettes = get_choice('ow_palettes', romweights, "default")

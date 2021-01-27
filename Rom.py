@@ -1650,14 +1650,22 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
         rom.write_byte(0xCA66 + 2, 0x44) # faster wall cutscene (0x22 normal, 0x44 faster(?), 0xFF fastest)
         rom.write_byte(0xF323 + 1, 0x02) # faster water pull cutscene (setting adc to 2, any faster still waits for water gate animation, so needs the tweak below)
         rom.write_byte(0x9C07, 0x0F) # water gate starting frame
+        rom.write_byte(0x45294, 0x03) # bird cutscene spin
+        rom.write_bytes(0x48d2a, [0xA9, 0x40, 0x01]) # bird cutscene delay 
     elif cutscenespeed == "blazing":
         rom.write_byte(0xCA66 + 2, 0xFF) 
         rom.write_byte(0xF323 + 1, 0x04) # faster water pull cutscene (setting adc to 4)
         rom.write_byte(0x9C07, 0x28) # water gate starting frame
+        rom.write_byte(0x45294, 0x03)
+        rom.write_bytes(0x48d2a, [0xA9, 0x80, 0x00])
     else:
         rom.write_byte(0xCA66 + 2, 0x22) 
         rom.write_byte(0xF323 + 1, 0x01) # faster water pull cutscene (setting adc to 4)
         rom.write_byte(0x9C07, 0x0F) # water gate starting frame
+        rom.write_byte(0x45294, 0x07)
+        # rom.write_bytes(0x330E8, [0xA9, 0x17, 0x8D, 0x2D, 0x01])
+        # rom.write_bytes(0x41d1d, [0xA9, 0x17, 0x8D, 0x2D, 0x01])
+        rom.write_bytes(0x48d2a, [0xA9, 0x80, 0x02])
 
     # Water cutscenes in Swamp Palace
     if cutscenespeed in ["fast"]:
