@@ -125,6 +125,10 @@ def guiMain(args=None):
     disableMusicCheckbutton = Checkbutton(romOptionsFrame, text="Disable music", variable=disableMusicVar)
     disableMusicCheckbutton.grid(row=0, column=0, sticky=E)
 
+    disableFlashingVar = IntVar(value=1)
+    disableFlashingCheckbutton = Checkbutton(romOptionsFrame, text="Disable flashing (anti-epilepsy)", variable=disableFlashingVar)
+    disableFlashingCheckbutton.grid(row=6, column=0, sticky=E)
+
     spriteDialogFrame = Frame(romOptionsFrame)
     spriteDialogFrame.grid(row=0, column=1)
     baseSpriteLabel = Label(spriteDialogFrame, text='Sprite:')
@@ -159,6 +163,15 @@ def guiMain(args=None):
     quickSwapVar = IntVar(value=1)
     quickSwapCheckbutton = Checkbutton(romOptionsFrame, text="L/R Quickswapping", variable=quickSwapVar)
     quickSwapCheckbutton.grid(row=1, column=0, sticky=E)
+
+    fastCutsceneFrame = Frame(romOptionsFrame)
+    fastCutsceneFrame.grid(row=6, column=1, sticky=E)
+    fastCutsceneLabel = Label(fastCutsceneFrame, text='Cutscene speed')
+    fastCutsceneLabel.pack(side=LEFT)
+    fastCutsceneVar = StringVar()
+    fastCutsceneVar.set('normal')
+    fastCutsceneOptionMenu = OptionMenu(fastCutsceneFrame, fastCutsceneVar, 'normal', 'fast', 'blazing')
+    fastCutsceneOptionMenu.pack(side=LEFT)
 
     fastMenuFrame = Frame(romOptionsFrame)
     fastMenuFrame.grid(row=1, column=1, sticky=E)
@@ -236,7 +249,7 @@ def guiMain(args=None):
 
 
     romDialogFrame = Frame(romOptionsFrame)
-    romDialogFrame.grid(row=6, column=0, columnspan=2, sticky=W+E)
+    romDialogFrame.grid(row=7, column=0, columnspan=2, sticky=W+E)
 
     baseRomLabel = Label(romDialogFrame, text='Base Rom: ')
     romVar = StringVar(value="Zelda no Densetsu - Kamigami no Triforce (Japan).sfc")
@@ -572,6 +585,8 @@ def guiMain(args=None):
         guiargs.retro = bool(retroVar.get())
         guiargs.quickswap = bool(quickSwapVar.get())
         guiargs.disablemusic = bool(disableMusicVar.get())
+        guiargs.cutscenespeed = fastCutsceneVar.get()
+        guiargs.reduceflashing = bool(disableFlashingVar.get())
         guiargs.ow_palettes = owPalettesVar.get()
         guiargs.uw_palettes = uwPalettesVar.get()
         guiargs.hud_palettes = hudPalettesVar.get()
@@ -692,9 +707,11 @@ def guiMain(args=None):
 
     quickSwapCheckbutton2 = Checkbutton(checkBoxFrame2, text="L/R Item quickswapping", variable=quickSwapVar)
     disableMusicCheckbutton2 = Checkbutton(checkBoxFrame2, text="Disable game music", variable=disableMusicVar)
+    disableFlashingCheckbutton2 = Checkbutton(checkBoxFrame2, text="Disable flashing (anti-epilepsy)", variable=disableFlashingVar)
 
     quickSwapCheckbutton2.pack(expand=True, anchor=W)
     disableMusicCheckbutton2.pack(expand=True, anchor=W)
+    disableFlashingCheckbutton2.pack(expand=True, anchor=W)
 
     fileDialogFrame2 = Frame(rightHalfFrame2)
 
@@ -780,9 +797,16 @@ def guiMain(args=None):
     shieldPalettesLabel2 = Label(shieldPalettesFrame2, text='Shield palettes')
     shieldPalettesLabel2.pack(side=LEFT)
 
+    fastCutsceneFrame2 = Frame(drowDownFrame2)
+    fastCutsceneOptionCutscene2 = OptionMenu(fastCutsceneFrame2, fastCutsceneVar, 'normal', 'fast', 'blazing')
+    fastCutsceneOptionCutscene2.pack(side=RIGHT)
+    fastCutsceneLabel2 = Label(fastCutsceneFrame2, text='Cutscene speed')
+    fastCutsceneLabel2.pack(side=LEFT)
+
     heartbeepFrame2.pack(expand=True, anchor=E)
     heartcolorFrame2.pack(expand=True, anchor=E)
     fastMenuFrame2.pack(expand=True, anchor=E)
+    fastCutsceneFrame2.pack(expand=True, anchor=E)
     owPalettesFrame2.pack(expand=True, anchor=E)
     uwPalettesFrame2.pack(expand=True, anchor=E)
     hudPalettesFrame2.pack(expand=True, anchor=E)
@@ -803,6 +827,8 @@ def guiMain(args=None):
         guiargs.shield_palettes = shieldPalettesVar.get()
         guiargs.quickswap = bool(quickSwapVar.get())
         guiargs.disablemusic = bool(disableMusicVar.get())
+        guiargs.cutscenespeed = fastCutsceneVar.get()
+        guiargs.reduceflashing = bool(disableFlashingVar.get())
         guiargs.rom = romVar2.get()
         guiargs.baserom = romVar.get()
         guiargs.sprite = sprite
@@ -1487,6 +1513,8 @@ def guiMain(args=None):
         retroVar.set(args.retro)
         quickSwapVar.set(int(args.quickswap))
         disableMusicVar.set(int(args.disablemusic))
+        disableFlashingVar.set(int(args.reduceflashing))
+        fastCutsceneVar.set(args.cutscenespeed)
         if args.count:
             countVar.set(str(args.count))
         if args.seed:
