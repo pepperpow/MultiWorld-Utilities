@@ -1602,6 +1602,12 @@
           "description": "Cutscenes are kept untouched",
           "defaultValue": 50
         },
+        "slow": {
+          "keyString": "rom.cutscenespeed.slow",
+          "friendlyName": "Slow",
+          "description": "The in-game cutscenes are slower",
+          "defaultValue": 0
+        },
         "fast": {
           "keyString": "rom.cutscenespeed.fast",
           "friendlyName": "Fast",
