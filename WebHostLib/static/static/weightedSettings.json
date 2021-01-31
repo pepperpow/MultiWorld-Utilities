@@ -1580,13 +1580,13 @@
           "keyString": "rom.reduceflashing.on",
           "friendlyName": "Disabled",
           "description": "Disables flashing.",
-          "defaultValue": 0
+          "defaultValue": 50
         },
         "off": {
           "keyString": "rom.reduceflashing.off",
           "friendlyName": "Enabled",
           "description": "Enables flashing.",
-          "defaultValue": 50
+          "defaultValue": 0
         }
       }
     },
