@@ -245,11 +245,6 @@ def parse_arguments(argv, no_defaults=False):
     parser.add_argument('--quickswap', help='Enable quick item swapping with L and R.', action='store_true')
     parser.add_argument('--disablemusic', help='Disables game music.', action='store_true')
     parser.add_argument('--reduceflashing', help='Disable much of the flashing animations', action='store_true')
-    parser.add_argument('--cutscenespeed', default='normal', const='normal', nargs='?', choices=['normal', 'slow', 'fast', 'blazing'],
-                        help='''\
-                             Speed up certain cutscenes in the game, such as wall speed and water draining.
-                             (default: %(default)s)
-                             ''')
     parser.add_argument('--mapshuffle', default=defval(False),
                         help='Maps are no longer restricted to their dungeons, but can be anywhere',
                         action='store_true')
@@ -409,7 +404,7 @@ def parse_arguments(argv, no_defaults=False):
                          "plando_items", "plando_texts", "plando_connections",
                          'remote_items', 'progressive', 'dungeon_counters', 'glitch_boots', 'killable_thieves',
                          'tile_shuffle', 'bush_shuffle', 'shuffle_prizes', 'sprite_pool', 'dark_room_logic',
-                         'restrict_dungeon_item_on_boss', 'cutscenespeed', 'reduceflashing',
+                         'restrict_dungeon_item_on_boss', 'reduceflashing',
                          'hud_palettes', 'sword_palettes', 'shield_palettes', 'link_palettes']:
                 value = getattr(defaults, name) if getattr(playerargs, name) is None else getattr(playerargs, name)
                 if player == 1:

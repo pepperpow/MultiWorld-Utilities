@@ -1590,38 +1590,6 @@
         }
       }
     },
-    "cutscenespeed": {
-      "keyString": "cutscenespeed",
-      "friendlyName": "Cutscene Speed",
-      "description": "Choose how fast the in-game cutscenes occur",
-      "inputType": "range",
-      "subOptions": {
-        "normal": {
-          "keyString": "rom.cutscenespeed.normal",
-          "friendlyName": "Vanilla",
-          "description": "Cutscenes are kept untouched",
-          "defaultValue": 50
-        },
-        "slow": {
-          "keyString": "rom.cutscenespeed.slow",
-          "friendlyName": "Slow",
-          "description": "The in-game cutscenes are slower",
-          "defaultValue": 0
-        },
-        "fast": {
-          "keyString": "rom.cutscenespeed.fast",
-          "friendlyName": "Fast",
-          "description": "The in-game cutscenes are faster",
-          "defaultValue": 0
-        },
-        "blazing": {
-          "keyString": "rom.cutscenespeed.blazing",
-          "friendlyName": "Blazing",
-          "description": "The in-game cutscenes animation are even faster",
-          "defaultValue": 0
-        }
-      }
-    },
     "quickswap": {
       "keyString": "rom.quickswap",
       "friendlyName": "Item Quick-Swap",

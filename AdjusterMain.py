@@ -31,7 +31,7 @@ def adjust(args):
     racerom = rom.read_byte(0x180213) > 0
     
     apply_rom_settings(rom, args.heartbeep, args.heartcolor, args.quickswap, args.fastmenu, args.disablemusic,
-                       args.sprite, palettes_options, cutscenespeed=args.cutscenespeed if not racerom else "normal", reduceflashing=args.reduceflashing)
+                       args.sprite, palettes_options, reduceflashing=args.reduceflashing)
     path = output_path(f'{os.path.basename(args.rom)[:-4]}_adjusted.sfc')
     rom.write_to_file(path)
 

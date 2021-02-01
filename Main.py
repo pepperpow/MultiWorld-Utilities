@@ -251,8 +251,7 @@ def main(args, seed=None):
         
         apply_rom_settings(rom, args.heartbeep[player], args.heartcolor[player], args.quickswap[player],
                            args.fastmenu[player], args.disablemusic[player], args.sprite[player],
-                           palettes_options, world, player, True,
-                           cutscenespeed=args.cutscenespeed[player] if not args.race else "normal", reduceflashing=args.reduceflashing[player])
+                           palettes_options, world, player, True, reduceflashing=args.reduceflashing[player])
 
         mcsb_name = ''
         if all([world.mapshuffle[player], world.compassshuffle[player], world.keyshuffle[player],

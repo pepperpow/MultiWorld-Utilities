@@ -164,15 +164,6 @@ def guiMain(args=None):
     quickSwapCheckbutton = Checkbutton(romOptionsFrame, text="L/R Quickswapping", variable=quickSwapVar)
     quickSwapCheckbutton.grid(row=1, column=0, sticky=E)
 
-    fastCutsceneFrame = Frame(romOptionsFrame)
-    fastCutsceneFrame.grid(row=6, column=1, sticky=E)
-    fastCutsceneLabel = Label(fastCutsceneFrame, text='Cutscene speed')
-    fastCutsceneLabel.pack(side=LEFT)
-    fastCutsceneVar = StringVar()
-    fastCutsceneVar.set('normal')
-    fastCutsceneOptionMenu = OptionMenu(fastCutsceneFrame, fastCutsceneVar, 'normal', 'fast', 'blazing')
-    fastCutsceneOptionMenu.pack(side=LEFT)
-
     fastMenuFrame = Frame(romOptionsFrame)
     fastMenuFrame.grid(row=1, column=1, sticky=E)
     fastMenuLabel = Label(fastMenuFrame, text='Menu speed')
@@ -585,7 +576,6 @@ def guiMain(args=None):
         guiargs.retro = bool(retroVar.get())
         guiargs.quickswap = bool(quickSwapVar.get())
         guiargs.disablemusic = bool(disableMusicVar.get())
-        guiargs.cutscenespeed = fastCutsceneVar.get()
         guiargs.reduceflashing = bool(disableFlashingVar.get())
         guiargs.ow_palettes = owPalettesVar.get()
         guiargs.uw_palettes = uwPalettesVar.get()
@@ -797,16 +787,9 @@ def guiMain(args=None):
     shieldPalettesLabel2 = Label(shieldPalettesFrame2, text='Shield palettes')
     shieldPalettesLabel2.pack(side=LEFT)
 
-    fastCutsceneFrame2 = Frame(drowDownFrame2)
-    fastCutsceneOptionCutscene2 = OptionMenu(fastCutsceneFrame2, fastCutsceneVar, 'normal', 'fast', 'blazing')
-    fastCutsceneOptionCutscene2.pack(side=RIGHT)
-    fastCutsceneLabel2 = Label(fastCutsceneFrame2, text='Cutscene speed')
-    fastCutsceneLabel2.pack(side=LEFT)
-
     heartbeepFrame2.pack(expand=True, anchor=E)
     heartcolorFrame2.pack(expand=True, anchor=E)
     fastMenuFrame2.pack(expand=True, anchor=E)
-    fastCutsceneFrame2.pack(expand=True, anchor=E)
     owPalettesFrame2.pack(expand=True, anchor=E)
     uwPalettesFrame2.pack(expand=True, anchor=E)
     hudPalettesFrame2.pack(expand=True, anchor=E)
@@ -827,7 +810,6 @@ def guiMain(args=None):
         guiargs.shield_palettes = shieldPalettesVar.get()
         guiargs.quickswap = bool(quickSwapVar.get())
         guiargs.disablemusic = bool(disableMusicVar.get())
-        guiargs.cutscenespeed = fastCutsceneVar.get()
         guiargs.reduceflashing = bool(disableFlashingVar.get())
         guiargs.rom = romVar2.get()
         guiargs.baserom = romVar.get()
@@ -1514,7 +1496,6 @@ def guiMain(args=None):
         quickSwapVar.set(int(args.quickswap))
         disableMusicVar.set(int(args.disablemusic))
         disableFlashingVar.set(int(args.reduceflashing))
-        fastCutsceneVar.set(args.cutscenespeed)
         if args.count:
             countVar.set(str(args.count))
         if args.seed:

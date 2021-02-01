@@ -28,11 +28,6 @@ def main():
     parser.add_argument('--quickswap', help='Enable quick item swapping with L and R.', action='store_true')
     parser.add_argument('--disablemusic', help='Disables game music.', action='store_true')
     parser.add_argument('--reduceflashing', help='Disable much of the flashing animations', action='store_true')
-    parser.add_argument('--cutscenespeed', default='normal', const='normal', nargs='?', choices=['normal', 'slow', 'fast', 'blazing'],
-                        help='''\
-                             Speed up certain cutscenes in the game, such as wall speed and water draining.
-                             (default: %(default)s)
-                             ''')
     parser.add_argument('--heartbeep', default='normal', const='normal', nargs='?', choices=['double', 'normal', 'half', 'quarter', 'off'],
                         help='''\
                              Select the rate at which the heart beep sound is played at
