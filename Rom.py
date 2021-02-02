@@ -1630,19 +1630,13 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
 
     # Reduce flashing by nopping out instructions
     if reduceflashing:
-        rom.write_bytes(0xEE651, [0xEA]*3) # nop out any flash triggers (storing to 0x0FF9)
-        rom.write_bytes(0xED315, [0xEA]*3) # includes aga lightning, mad batter (untested), vitreous (untested)
-        rom.write_bytes(0x2FBE0, [0xEA]*3) 
-        rom.write_bytes(0x67535, [0xEA]*3) 
+        rom.write_bytes(0xEE9B6, [0xA9, 0x00, 0xEA])
 
         rom.write_bytes(0x42ACB, [0xEA]*3) # nop out ether palette trigger ; lda 0 always beqs
         rom.write_bytes(0x123FE, [0x72]) # set lightning flash in misery mire (and standard?) to brightness 0x72
         rom.write_byte(0x30817F, 0x01) # rom accessibility option
     else:
-        rom.write_bytes(0xEE651, [0x8D, 0xF9, 0x0F])  
-        rom.write_bytes(0xED315, [0x8D, 0xF9, 0x0F])  
-        rom.write_bytes(0x2FBE0, [0x8D, 0xF9, 0x0F]) 
-        rom.write_bytes(0x67535, [0x8E, 0xF9, 0x0F]) 
+        rom.write_bytes(0xEE9B6, [0xAD, 0xF9, 0x0F])
 
         rom.write_bytes(0x42ACB, [0xBD, 0x54, 0x0C]) 
         rom.write_bytes(0x123FE, [0x32])
