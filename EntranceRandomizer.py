@@ -244,7 +244,7 @@ def parse_arguments(argv, no_defaults=False):
                              ''')
     parser.add_argument('--quickswap', help='Enable quick item swapping with L and R.', action='store_true')
     parser.add_argument('--disablemusic', help='Disables game music.', action='store_true')
-    parser.add_argument('--reduceflashing', help='Disable much of the flashing animations', action='store_true')
+    parser.add_argument('--enableflashing', help='Reenable flashing animations (unfriendly to epilepsy, always disabled in race roms)', action='store_false', dest="reduceflashing")
     parser.add_argument('--mapshuffle', default=defval(False),
                         help='Maps are no longer restricted to their dungeons, but can be anywhere',
                         action='store_true')
