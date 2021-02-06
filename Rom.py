@@ -1630,17 +1630,13 @@ def apply_rom_settings(rom, beep, color, quickswap, fastmenu, disable_music, spr
 
     # Reduce flashing by nopping out instructions
     if reduceflashing:
-        rom.write_byte(0x757FE, 0x6B)
-
-        rom.write_bytes(0x42ACB, [0xEA]*3) # nop out ether palette trigger ; lda 0 always beqs
+        rom.write_bytes(0x17EAB, [0x09, 0x21, 0x04, 0x60]) # nullifies aga lightning, cutscene, vitreous, bat, ether
         rom.write_bytes(0x123FE, [0x72]) # set lightning flash in misery mire (and standard?) to brightness 0x72
-        rom.write_byte(0x30817F, 0x01) # internal rom accessibility option
+        # rom.write_byte(0x30817F, 0x01) # internal rom  option (this now causes a desync ?)
     else:
-        rom.write_byte(0x757FE, 0x85)
-
-        rom.write_bytes(0x42ACB, [0xBD, 0x54, 0x0C]) 
+        rom.write_bytes(0x17EAB, [0x85, 0x00, 0x29, 0x1F])
+        # rom.write_bytes(0x17EE2, [0x05, 0x02, 0x05, 0x04, 0x60])
         rom.write_bytes(0x123FE, [0x32])
-        rom.write_byte(0x30817F, 0x00)
 
 
     rom.write_byte(0x18004B, 0x01 if quickswap else 0x00)
