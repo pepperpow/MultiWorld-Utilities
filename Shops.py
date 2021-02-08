@@ -209,10 +209,39 @@ def ShopSlotFill(world):
                     else:
                         price = world.random.randrange(8, 56)
 
-                    price *= 5
+                    price *=5
+
+                    if 'p' in world.shop_shuffle[location.player]:
+                        price = return_funny_price(price, item_name, world, location.player)
+                    
                     shop.push_inventory(int(location.name[-1]) - 1, item_name, price, 1,
                                         location.item.player if location.item.player != location.player else 0)
 
+price_blacklist = {'rupee': {'Rupees'}, 'heart': {'Small Heart', 'Apple'}, 'magic': {'Magic Jar'}, 'bomb': {'Bombs', 'Single Bomb'},
+                        'arrow': {'Arrows', 'Single Arrow'}, 'ch': {}, 'cb': {}, 'ca': {}, 'keys': {}, 'potion': {}}
+
+def return_funny_price(price, item_name, world, player):
+    if item_name is None:
+        return price
+    price = max(1, price//5) # funny units
+    my_price_types = [x for x in price_blacklist]
+    my_choices = world.random.sample(my_price_types, len(my_price_types))
+    for p in my_choices:
+        if any(x in item_name for x in price_blacklist[p]):
+            continue
+        if p in ['rupee', 'cb', 'ca'] or (p == 'keys' and world.keyshuffle[player] != 'universal'):
+            price *= 5
+        else:
+            if p == 'heart': price = min(0x10, price)*4
+            if p == 'magic': price = min(0x20, price)*4
+            if p == 'bomb': price = min(10, price//4)
+            if p == 'arrow': price = min(30, price//2)
+            if p == 'ch': price = min(0x3, max(0x1, price//8))*8
+            if p == 'keys': price = min(0x3, max(0x1, price//8))
+            if p == 'potion': price = world.random.randrange(0, 6)
+            price |= 0x8000 | (0x100*(my_price_types.index(p)-1))
+        break
+    return price
 
 def create_shops(world, player: int):
     option = world.shop_shuffle[player]
@@ -320,7 +349,7 @@ shop_table_by_location_id[(SHOP_ID_START + total_shop_slots + 4)] = "Take-Any #4
 shop_table_by_location = {y: x for x, y in shop_table_by_location_id.items()}
 
 shop_generation_types = {
-    'arrows': [('Single Arrow', 5), ('Arrows (10)', 50)],
+    'arrows': [('Arrows (10)', 50), ('Arrows (10)', 50)],
     'bombs': [('Single Bomb', 10), ('Bombs (3)', 30), ('Bombs (10)', 50)],
     'shields': [('Red Shield', 500), ('Blue Shield', 50)],
     'potions': [('Red Potion', 150), ('Green Potion', 90), ('Blue Potion', 190)],
@@ -421,8 +450,8 @@ def shuffle_shops(world, items, player: int):
 
             def adjust_item(item):
                 if item:
-                    item["price"] = price_adjust(item["price"])
-                    item['replacement_price'] = price_adjust(item["price"])
+                    item["price"] = return_funny_price(price_adjust(item["price"]), item['item'], world, player)
+                    item['replacement_price'] = return_funny_price(price_adjust(item["replacement_price"]), item['replacement'], world, player)
 
             for item in total_inventory:
                 adjust_item(item)
